@@ -1,5 +1,11 @@
 import Avatar from 'components/Avatar'
 import logo from 'assets/logo.svg'
+import { FaFacebook, FaFacebookF, FaInstagram } from 'react-icons/fa6'
+import { CiCamera, CiTwitter, CiYoutube } from 'react-icons/ci'
+import { FiLinkedin } from 'react-icons/fi'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+
 
 const randoms = [
   [1, 2],
@@ -8,60 +14,80 @@ const randoms = [
 ]
 
 function App() {
+
+  const [platform, setPlatform] = useState("");
+  const [url, setUrl] = useState("");
+  const [profile, setProfile] = useState({
+    facebook: 0,
+    instagram: 0,
+    twitter: 0,
+    snapchat: 0,
+    youtube: 0,
+    linkedin: 0
+  });
+
+  const onFetchFollowers = async () => {
+    if(platform == "") return alert("Select the platform!");
+    if(url == "") return alert("Input profile url!");
+    const response = await axios.post(`http://44.211.206.81/social/api/get_${platform}_followers`, {
+      profile_url: url
+    })
+    let _profile = {...profile};
+    _profile[platform] = response.data.followers_count;
+    setProfile(_profile);
+  }
+
   return (
-    <div className="relative overflow-hidden bg-white">
-      <div className="h-screen sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
-        <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
-          <div className="sm:max-w-lg">
-            <div className="my-4">
-              <Avatar size="large" src={logo} />
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Welcome!
-            </h1>
-            <p className="mt-4 text-xl text-gray-500">
-              This is a boilerplate build with Vite, React 18, TypeScript,
-              Vitest, Testing Library, TailwindCSS 3, Eslint and Prettier.
-            </p>
+    <div className="relative overflow-hidden bg-white flex justify-center">
+      <div className='bg-green-400 px-4 py-8 w-1/2 h-[100vh]'>
+        <h1 className='text-3xl font-bold'>Social Media Dashboard</h1>
+        <div className='flex gap-2 flex-wrap'>
+          <select defaultValue={""} className='p-2 border border-gray-600 rounded' onChange={(e) => setPlatform(e.target.value)}>
+            <option value={""}>Select platform</option>
+            <option value={"facebook"}>Facebook</option>
+            <option value={"instagram"}>Instagram</option>
+            <option value={"twitter"}>X(Twitter)</option>
+            <option value={"snapchat"}>SnapChat</option>
+            <option value={"youtube"}>YouTube</option>
+            <option value={"linkedin"}>LinkedIn</option>
+          </select>
+          <input placeholder='Enter social media handle' className='p-2 min-w-[300px] border border-gray-600 rounded' onChange={e => setUrl(e.target.value)}></input>
+          <button className='bg-black text-white border border-gray-600 rounded p-2' onClick={onFetchFollowers}>Fetch Followers</button>
+        </div>
+        <div className='grid grid-rows-3 grid-cols-2 m-4 gap-4'>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>Facebook</h1>
+            <FaFacebookF/>
+            <span className='text-2xl font-bold'>{profile.facebook}</span>
           </div>
-          <div className="my-10">
-            <a
-              href="vscode://"
-              className="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-700 focus:ring-offset-2"
-            >
-              Start building for free
-            </a>
-            <div
-              aria-hidden="true"
-              className="pointer-events-none mt-10 md:mt-0 lg:absolute lg:inset-y-0 lg:mx-auto lg:w-full lg:max-w-7xl"
-            >
-              <div className="absolute sm:left-1/2 sm:top-0 sm:translate-x-8 lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-8">
-                <div className="flex items-center space-x-6 lg:space-x-8">
-                  {randoms.map((random, number) => (
-                    <div
-                      key={`random-${random[number]}`}
-                      className="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8"
-                    >
-                      {random.map((number) => (
-                        <div
-                          key={`random-${number}`}
-                          className="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100"
-                        >
-                          <img
-                            src={`https://picsum.photos/600?random=${number}`}
-                            alt=""
-                            className="size-full bg-indigo-100 object-cover object-center"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>Instagram</h1>
+            <FaInstagram/>
+            <span className='text-2xl font-bold'>{profile.instagram}</span>
+          </div>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>X(Twitter)</h1>
+            <CiTwitter />
+            <span className='text-2xl font-bold'>{profile.twitter}</span>
+          </div>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>Snapchat</h1>
+            <CiCamera/>
+            <span className='text-2xl font-bold'>{profile.snapchat}</span>
+          </div>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>YouTube</h1>
+            <CiYoutube/>
+            <span className='text-2xl font-bold'>{profile.youtube}</span>
+          </div>
+          <div className='flex flex-col items-center bg-green-900 rounded-xl p-6 text-white'>
+            <h1>LinkedIn</h1>
+            <FiLinkedin/>
+            <span className='text-2xl font-bold'>{profile.linkedin}</span>
           </div>
         </div>
       </div>
+
     </div>
   )
 }
